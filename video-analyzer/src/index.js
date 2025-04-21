@@ -1,19 +1,26 @@
-const videoInput = document.createElement('input');
-videoInput.type = 'file';
-videoInput.accept = 'video/mp4';
-videoInput.onchange = handleVideoUpload;
+import { loadVideo, analyzeVideoProperties } from './utils/videoProcessor.js';
+import path from 'path'; // Correct import for Node.js built-in module
+import fs from 'fs'; // Correct import for Node.js built-in module
 
-document.body.appendChild(videoInput);
+console.log('Script loaded successfully');
 
-function handleVideoUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const videoUrl = URL.createObjectURL(file);
-        analyzeVideo(videoUrl);
-    }
-}
+const videosDir = path.resolve('./videos');
+const videoFiles = fs.readdirSync(videosDir).filter((file) => file.endsWith('.mp4'));
 
-function analyzeVideo(videoUrl) {
-    // Placeholder for video analysis logic
-    console.log('Analyzing video:', videoUrl);
+console.log('Available videos:', videoFiles);
+
+videoFiles.forEach((file) => {
+    const videoPath = path.join(videosDir, file);
+    analyzeVideo(videoPath);
+});
+
+function analyzeVideo(videoPath) {
+    loadVideo(videoPath)
+        .then(() => analyzeVideoProperties(videoPath))
+        .then((properties) => {
+            console.log(`Analysis for ${path.basename(videoPath)}:`, properties);
+        })
+        .catch((error) => {
+            console.error(`Error analyzing video ${path.basename(videoPath)}:`, error);
+        });
 }

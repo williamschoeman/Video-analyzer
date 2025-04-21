@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Analyzer</title>
+</head>
+<body>
+    <h1>Video Analyzer Application</h1>
+    <p>Click a button below to analyze a video:</p>
+    <div id="videoButtons"></div>
+    <pre id="results"></pre>
+
+    <script>
+        // Fetch the list of available videos
+        fetch('/videos')
+            .then((response) => response.json())
+            .then((videos) => {
+                const buttonsContainer = document.getElementById('videoButtons');
+                videos.forEach((video) => {
+                    const button = document.createElement('button');
+                    button.textContent = `Analyze ${video}`;
+                    button.onclick = async () => {
+                        const response = await fetch(`/analyze?video=${encodeURIComponent(video)}`);
+                        const result = await response.json();
+                        document.getElementById('results').textContent = JSON.stringify(result, null, 2);
+                    };
+                    buttonsContainer.appendChild(button);
+                });
+            })
+            .catch((error) => console.error('Error fetching video list:', error));
+    </script>
+</body>
+</html>
